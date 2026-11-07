@@ -676,6 +676,16 @@ public:
           ```
 
           Whenever Nix needs to build a derivation for a system contained in *systems*, it will invoke *program* with the command line arguments *args*, and an additional argument containing the path of a JSON document that describes the build environment.
+
+          Two optional keys restrict this further by the derivation's [`requiredSystemFeatures`](@docroot@/language/advanced-attributes.md#adv-attr-requiredSystemFeatures):
+
+          - *excludeFeatures*: derivations requiring any of these features are never handed to this builder.
+            Use it for features the external builder cannot implement, such as `recursive-nix`, so that those derivations keep whatever treatment they would otherwise get instead of being dispatched and failing.
+          - *features*: if non-empty, only derivations whose required features are all listed here are handed to this builder.
+
+          ```json
+          [ {"systems": ["x86_64-linux"], "program": "/path/to/helper", "args": [], "excludeFeatures": ["recursive-nix"]} ]
+          ```
           The JSON document looks like this:
 
           ```json
@@ -735,8 +745,12 @@ public:
     /**
      * Finds the first external derivation builder that supports this
      * derivation, or else returns a null pointer.
+     *
+     * @param requiredFeatures the derivation's `requiredSystemFeatures`,
+     * matched against each handler's `features` / `excludeFeatures`.
      */
-    const ExternalBuilder * findExternalDerivationBuilderIfSupported(const BasicDerivation & drv);
+    const ExternalBuilder *
+    findExternalDerivationBuilderIfSupported(const BasicDerivation & drv, const StringSet & requiredFeatures);
 };
 
 template<>

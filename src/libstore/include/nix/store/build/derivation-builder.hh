@@ -314,6 +314,27 @@ struct ExternalBuilder
     StringSet systems;
     std::filesystem::path program;
     std::vector<std::string> args;
+
+    /**
+     * If non-empty, only derivations whose `requiredSystemFeatures` are
+     * all listed here are handed to this builder.
+     */
+    StringSet features;
+
+    /**
+     * Derivations requiring any of these features are never handed to
+     * this builder, even when their system matches. Useful for features
+     * the external builder cannot implement, so that such derivations
+     * stay on whatever path would otherwise handle them, instead of
+     * being dispatched and failing.
+     */
+    StringSet excludeFeatures;
+
+    /**
+     * Whether this builder is willing to build `drv`: its system must
+     * match, and its features must satisfy `features` / `excludeFeatures`.
+     */
+    bool supports(const BasicDerivation & drv, const StringSet & requiredFeatures) const;
 };
 
 struct LocalSettings;

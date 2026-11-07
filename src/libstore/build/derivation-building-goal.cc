@@ -390,7 +390,8 @@ Goal::Co<DerivationBuildingGoal::Result> DerivationBuildingGoal::tryToBuild()
          * use that. If there is not, then check if we can do a "true" local
          * build.
          */
-        auto * ext = settings.getLocalSettings().findExternalDerivationBuilderIfSupported(*drv);
+        auto * ext = settings.getLocalSettings().findExternalDerivationBuilderIfSupported(
+            *drv, drvOptions.getRequiredSystemFeatures(*drv));
 
         if (ext)
             return LocalBuildCapability{*localStoreP, ext};

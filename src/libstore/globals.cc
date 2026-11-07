@@ -279,10 +279,12 @@ bool Settings::isWSL1()
 #endif
 }
 
-const ExternalBuilder * LocalSettings::findExternalDerivationBuilderIfSupported(const BasicDerivation & drv)
+const ExternalBuilder * LocalSettings::findExternalDerivationBuilderIfSupported(
+    const BasicDerivation & drv, const StringSet & requiredFeatures)
 {
     if (auto it = std::ranges::find_if(
-            externalBuilders.get(), [&](const auto & handler) { return handler.systems.contains(drv.platform); });
+            externalBuilders.get(),
+            [&](const auto & handler) { return handler.supports(drv, requiredFeatures); });
         it != externalBuilders.get().end())
         return &*it;
     return nullptr;
